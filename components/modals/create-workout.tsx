@@ -1,10 +1,10 @@
 import SearchExercises from "@/components/exercise-search";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
-import { CreateWorkout, Workout } from "@/components/types";
+import { CreateWorkout, Exercise, Workout } from "@/components/types";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { Modal, Pressable, StyleSheet, TouchableOpacity } from "react-native";
+import { Modal, Pressable, StyleSheet, TouchableOpacity, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 
 const apiUrl = process.env.EXPO_PUBLIC_API_HOST;
@@ -21,13 +21,10 @@ const CreateWorkoutModal = ({ visible, onClose, onCreate }: CreateWorkoutModalPr
         userId: 1, //TODO: get user id from auth once feature is implemented
         exercises: [],
     });
-    const [selectedExercise, setSelectedExercise] = useState("");
+    const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([]);
 
     const createWorkout = async () => {
-        const ids = selectedExercise
-            .split(",")
-            .map((id) => parseInt(id.trim()))
-            .filter((id) => !isNaN(id));
+        const ids = selectedExercises.map((ex) => ex.id);
 
         const workoutToSave: CreateWorkout = {
             ...createdWorkout,
@@ -45,7 +42,7 @@ const CreateWorkoutModal = ({ visible, onClose, onCreate }: CreateWorkoutModalPr
 
             const savedWorkout = await res.json();
             setCreatedWorkout({ name: "", userId: 1, exercises: [] });
-            setSelectedExercise("");
+            setSelectedExercises([]);
             onCreate(savedWorkout);
         } catch (err) {
             console.error("Failed to create workout", err);
@@ -58,33 +55,43 @@ const CreateWorkoutModal = ({ visible, onClose, onCreate }: CreateWorkoutModalPr
                 <TouchableOpacity onPress={onClose}>
                     <Ionicons name="chevron-back" size={28} color="#f6f6f6" />
                 </TouchableOpacity>
-                <ThemedText type="title">Workout Details</ThemedText>
-                <TextInput
-                    placeholder="Workout Name"
-                    value={createdWorkout.name}
-                    onChangeText={(text) => setCreatedWorkout((prev) => ({ ...prev, name: text }))}
-                    style={{
-                        padding: 12,
-                        borderRadius: 8,
-                        backgroundColor: "#fff",
-                        marginBottom: 16,
-                    }}
-                />
-                <SearchExercises
-                    selectedExercise={selectedExercise}
-                    setSelectedExercise={setSelectedExercise}
-                />
-                <Pressable
-                    onPress={createWorkout}
-                    style={{
-                        padding: 12,
-                        backgroundColor: "#007AFF",
-                        borderRadius: 8,
-                        marginTop: 16,
-                    }}
-                >
-                    <ThemedText style={{ color: "#fff" }}>Save Workout</ThemedText>
-                </Pressable>
+                <View style={{ flex: 6, flexDirection: "column", justifyContent: "space-between" }}>
+                    <View>
+                        <ThemedText type="title" style={{ marginBottom: 16 }}>
+                            Workout Details
+                        </ThemedText>
+                        <TextInput
+                            placeholder="Workout Name"
+                            value={createdWorkout.name}
+                            onChangeText={(text) =>
+                                setCreatedWorkout((prev) => ({ ...prev, name: text }))
+                            }
+                            style={{
+                                padding: 12,
+                                borderRadius: 8,
+                                backgroundColor: "#fff",
+                                marginBottom: 16,
+                            }}
+                        />
+                        <SearchExercises
+                            selectedExercises={selectedExercises}
+                            setSelectedExercises={setSelectedExercises}
+                        />
+                    </View>
+                    <View style={{ marginBottom: 20 }}>
+                        <Pressable
+                            onPress={createWorkout}
+                            style={{
+                                padding: 12,
+                                backgroundColor: "#007AFF",
+                                borderRadius: 8,
+                                marginTop: 16,
+                            }}
+                        >
+                            <ThemedText style={{ color: "#fff" }}>Save Workout</ThemedText>
+                        </Pressable>
+                    </View>
+                </View>
             </ThemedView>
         </Modal>
     );
