@@ -8,14 +8,16 @@ import { Modal, Pressable, ScrollView, StyleSheet, TouchableOpacity, View } from
 type WorkoutModalProps = {
     workout: Workout | null;
     onClose: () => void;
+    onDelete: (workout: Workout | null) => void;
 };
 
-const WorkoutModal = ({ workout, onClose }: WorkoutModalProps) => {
+const WorkoutModal = ({ workout, onClose, onDelete }: WorkoutModalProps) => {
     const apiUrl = process.env.EXPO_PUBLIC_API_HOST;
 
     const deleteWorkout = async (id: number) => {
         try {
             await fetch(`${apiUrl}/workouts/${id}`, { method: "DELETE" });
+            onDelete(workout);
             onClose();
         } catch (err) {
             console.error("Failed to delete workout", err);

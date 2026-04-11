@@ -53,7 +53,15 @@ export default function WorkoutScreen() {
                     </TouchableOpacity>
                 )}
             />
-            <WorkoutModal workout={selectedWorkout} onClose={() => setSelectedWorkout(null)} />
+            <WorkoutModal
+                workout={selectedWorkout}
+                onClose={() => setSelectedWorkout(null)}
+                onDelete={(workout) => {
+                    if (!workout) return;
+                    setWorkouts((prev) => prev.filter((w) => w.id !== workout.id));
+                    setSelectedWorkout(null);
+                }}
+            />
             <CreateWorkoutModal
                 visible={modalCreateWorkoutVisible}
                 onClose={() => setModalCreateWorkoutVisible(false)}
