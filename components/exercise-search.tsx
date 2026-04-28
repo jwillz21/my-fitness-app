@@ -1,6 +1,6 @@
 import debounce from "lodash.debounce";
 import React, { useCallback, useState } from "react";
-import { ScrollView, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Exercise } from "./types";
 
 type ExerciseProps = {
@@ -65,26 +65,11 @@ const SearchExercises = ({
                     value={query}
                     onChangeText={handleChange}
                     placeholder="Search exercises..."
-                    style={{
-                        padding: 12,
-                        borderRadius: 8,
-                        backgroundColor: "#fff",
-                        marginBottom: 16,
-                    }}
+                    style={styles.exerciseSearchInput}
                 />
 
                 {showDropdown && suggestions.length > 0 && (
-                    <View
-                        style={{
-                            position: "absolute",
-                            top: 50,
-                            left: 0,
-                            right: 0,
-                            backgroundColor: "white",
-                            borderWidth: 1,
-                            zIndex: 10,
-                        }}
-                    >
+                    <View style={styles.exerciseInputDropDown}>
                         {suggestions.map((item) => (
                             <TouchableOpacity
                                 key={item.id}
@@ -97,42 +82,22 @@ const SearchExercises = ({
                     </View>
                 )}
             </View>
-            <ScrollView
-                style={{
-                    marginTop: 20,
-                    padding: 10,
-                }}
-            >
+            <ScrollView style={styles.exerciseScrollContainer}>
                 {selectedExercises.length === 0 && (
-                    <Text style={{ color: "#fff" }}>No exercises selected</Text>
+                    <Text style={styles.primaryText}>No exercises selected</Text>
                 )}
 
                 {selectedExercises.map((exercise) => (
-                    <View
-                        key={exercise.id}
-                        style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            paddingVertical: 8,
-                            borderColor: "#ccc",
-                            borderBottomWidth: 1,
-                        }}
-                    >
+                    <View key={exercise.id} style={styles.exerciseItem}>
                         <View>
-                            <Text style={{ color: "#fff" }}>{exercise.name}</Text>
-                            <View style={{ flexDirection: "row", gap: 8 }}>
-                                <Text style={{ color: "#fff" }}>Sets:</Text>
+                            <Text style={styles.primaryText}>{exercise.name}</Text>
+                            <View style={styles.exerciseMetaWrapper}>
+                                <Text style={styles.primaryText}>Sets:</Text>
                                 <TextInput
                                     placeholder="0"
                                     keyboardType="numeric"
                                     placeholderTextColor="#acacac"
-                                    style={{
-                                        width: 25,
-                                        color: "#fff",
-                                        paddingLeft: 8,
-                                        borderBottomWidth: 1,
-                                        borderColor: "#acacac",
-                                    }}
+                                    style={styles.smallNumericInput}
                                     onChangeText={(text) =>
                                         setExerciseInputs((prev) => ({
                                             ...prev,
@@ -143,18 +108,12 @@ const SearchExercises = ({
                                         }))
                                     }
                                 />
-                                <Text style={{ color: "#fff" }}>Reps:</Text>
+                                <Text style={styles.primaryText}>Reps:</Text>
                                 <TextInput
                                     placeholder="0"
                                     keyboardType="numeric"
                                     placeholderTextColor="#acacac"
-                                    style={{
-                                        width: 25,
-                                        color: "#fff",
-                                        paddingLeft: 8,
-                                        borderBottomWidth: 1,
-                                        borderColor: "#acacac",
-                                    }}
+                                    style={styles.smallNumericInput}
                                     onChangeText={(text) =>
                                         setExerciseInputs((prev) => ({
                                             ...prev,
@@ -168,7 +127,7 @@ const SearchExercises = ({
                             </View>
                         </View>
                         <TouchableOpacity onPress={() => handleRemoveExercise(exercise)}>
-                            <Text style={{ color: "red" }}>Remove</Text>
+                            <Text style={styles.alertText}>Remove</Text>
                         </TouchableOpacity>
                     </View>
                 ))}
@@ -176,5 +135,51 @@ const SearchExercises = ({
         </View>
     );
 };
+
+const styles = StyleSheet.create({
+    smallNumericInput: {
+        width: 25,
+        color: "#fff",
+        paddingLeft: 8,
+        borderBottomWidth: 1,
+        borderColor: "#acacac",
+    },
+    primaryText: {
+        color: "#fff",
+    },
+    alertText: {
+        color: "red",
+    },
+    exerciseMetaWrapper: {
+        flexDirection: "row",
+        gap: 8,
+    },
+    exerciseSearchInput: {
+        padding: 12,
+        borderRadius: 8,
+        backgroundColor: "#fff",
+        marginBottom: 16,
+    },
+    exerciseInputDropDown: {
+        position: "absolute",
+        top: 50,
+        left: 0,
+        right: 0,
+        backgroundColor: "white",
+        borderWidth: 1,
+        zIndex: 10,
+    },
+    exerciseItem: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        paddingVertical: 8,
+        borderColor: "#ccc",
+        borderBottomWidth: 1,
+    },
+    exerciseScrollContainer: {
+        marginTop: 20,
+        padding: 10,
+    },
+});
 
 export default SearchExercises;
