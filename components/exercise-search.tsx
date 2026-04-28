@@ -5,15 +5,19 @@ import { Exercise } from "./types";
 
 type ExerciseProps = {
     selectedExercises: Exercise[];
-    setSelectedExercises: (exercises: Exercise[]) => void;
+    setSelectedExercises: React.Dispatch<React.SetStateAction<Exercise[]>>;
+    exerciseInputs: Record<number, { sets: number; reps: number }>;
+    setExerciseInputs: React.Dispatch<
+        React.SetStateAction<Record<number, { sets: number; reps: number }>>
+    >;
 };
 
-// type Suggestion = {
-//     id: number;
-//     name: string;
-// };
-
-const SearchExercises = ({ selectedExercises, setSelectedExercises }: ExerciseProps) => {
+const SearchExercises = ({
+    selectedExercises,
+    setSelectedExercises,
+    exerciseInputs,
+    setExerciseInputs,
+}: ExerciseProps) => {
     const [query, setQuery] = useState("");
     const [suggestions, setSuggestions] = useState<Exercise[]>([]);
     const [showDropdown, setShowDropdown] = useState(false);
@@ -46,7 +50,12 @@ const SearchExercises = ({ selectedExercises, setSelectedExercises }: ExercisePr
     };
 
     const handleRemoveExercise = (exercise: Exercise) => {
-        setSelectedExercises(selectedExercises.filter((ex) => ex !== exercise));
+        setSelectedExercises(selectedExercises.filter((ex) => ex.id !== exercise.id));
+        setExerciseInputs((prev) => {
+            const newInputs = { ...prev };
+            delete newInputs[exercise.id];
+            return newInputs;
+        });
     };
 
     return (
@@ -91,7 +100,6 @@ const SearchExercises = ({ selectedExercises, setSelectedExercises }: ExercisePr
             <ScrollView
                 style={{
                     marginTop: 20,
-                    maxHeight: 400,
                     padding: 10,
                 }}
             >
@@ -110,8 +118,55 @@ const SearchExercises = ({ selectedExercises, setSelectedExercises }: ExercisePr
                             borderBottomWidth: 1,
                         }}
                     >
-                        <Text style={{ color: "#fff" }}>{exercise.name}</Text>
-
+                        <View>
+                            <Text style={{ color: "#fff" }}>{exercise.name}</Text>
+                            <View style={{ flexDirection: "row", gap: 8 }}>
+                                <Text style={{ color: "#fff" }}>Sets:</Text>
+                                <TextInput
+                                    placeholder="0"
+                                    keyboardType="numeric"
+                                    placeholderTextColor="#acacac"
+                                    style={{
+                                        width: 25,
+                                        color: "#fff",
+                                        paddingLeft: 8,
+                                        borderBottomWidth: 1,
+                                        borderColor: "#acacac",
+                                    }}
+                                    onChangeText={(text) =>
+                                        setExerciseInputs((prev) => ({
+                                            ...prev,
+                                            [exercise.id]: {
+                                                ...prev[exercise.id],
+                                                sets: Number(text),
+                                            },
+                                        }))
+                                    }
+                                />
+                                <Text style={{ color: "#fff" }}>Reps:</Text>
+                                <TextInput
+                                    placeholder="0"
+                                    keyboardType="numeric"
+                                    placeholderTextColor="#acacac"
+                                    style={{
+                                        width: 25,
+                                        color: "#fff",
+                                        paddingLeft: 8,
+                                        borderBottomWidth: 1,
+                                        borderColor: "#acacac",
+                                    }}
+                                    onChangeText={(text) =>
+                                        setExerciseInputs((prev) => ({
+                                            ...prev,
+                                            [exercise.id]: {
+                                                ...prev[exercise.id],
+                                                reps: Number(text),
+                                            },
+                                        }))
+                                    }
+                                />
+                            </View>
+                        </View>
                         <TouchableOpacity onPress={() => handleRemoveExercise(exercise)}>
                             <Text style={{ color: "red" }}>Remove</Text>
                         </TouchableOpacity>

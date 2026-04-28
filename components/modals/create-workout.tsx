@@ -22,15 +22,20 @@ const CreateWorkoutModal = ({ visible, onClose, onCreate }: CreateWorkoutModalPr
         exercises: [],
     });
     const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([]);
+    const [exerciseInputs, setExerciseInputs] = useState<
+        Record<number, { sets: number; reps: number }>
+    >({});
 
     const createWorkout = async () => {
         const ids = selectedExercises.map((ex) => ex.id);
 
         const workoutToSave: CreateWorkout = {
             ...createdWorkout,
-            exercises: ids.map((id, index) => ({
-                exerciseId: id,
+            exercises: selectedExercises.map((ex, index) => ({
+                exerciseId: ex.id,
                 orderIndex: index,
+                sets: exerciseInputs[ex.id]?.sets ?? 0,
+                reps: exerciseInputs[ex.id]?.reps ?? 0,
             })),
         };
         try {
@@ -43,6 +48,7 @@ const CreateWorkoutModal = ({ visible, onClose, onCreate }: CreateWorkoutModalPr
             const savedWorkout = await res.json();
             setCreatedWorkout({ name: "", userId: 1, exercises: [] });
             setSelectedExercises([]);
+            setExerciseInputs({});
             onCreate(savedWorkout);
         } catch (err) {
             console.error("Failed to create workout", err);
@@ -55,7 +61,7 @@ const CreateWorkoutModal = ({ visible, onClose, onCreate }: CreateWorkoutModalPr
                 <TouchableOpacity onPress={onClose}>
                     <Ionicons name="chevron-back" size={28} color="#f6f6f6" />
                 </TouchableOpacity>
-                <View style={{ flex: 6, flexDirection: "column", justifyContent: "space-between" }}>
+                <View style={{ flex: 1 }}>
                     <View>
                         <ThemedText type="title" style={{ marginBottom: 16 }}>
                             Workout Details
@@ -76,6 +82,8 @@ const CreateWorkoutModal = ({ visible, onClose, onCreate }: CreateWorkoutModalPr
                         <SearchExercises
                             selectedExercises={selectedExercises}
                             setSelectedExercises={setSelectedExercises}
+                            exerciseInputs={exerciseInputs}
+                            setExerciseInputs={setExerciseInputs}
                         />
                     </View>
                     <View style={{ marginBottom: 20 }}>
